@@ -1,25 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import BoardComponents from "./commponents/BoardComponents";
+import {Board} from "./models/Board";
+import {Colors} from "./models/Colors";
+import {Player} from "./models/Player";
+import LostFigurs from "./commponents/LostFigurs";
 
 function App() {
+
+    const [board, setBoard] = useState(new Board());
+    const [WhitePlayer, setWhitePlayer] = useState(new Player(Colors.WHITE));
+    const [BlackPlayer, setBlackPlayer] = useState(new Player(Colors.BLACK));
+    const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+
+
+    useEffect(() => {
+        restart()
+        setCurrentPlayer(WhitePlayer)
+    }, [])
+
+    function swapPlayer() {
+        setCurrentPlayer(currentPlayer?.color === Colors.WHITE ? BlackPlayer : WhitePlayer)
+    }
+
+    function restart(){
+        const newBoard = new Board();
+        newBoard.initCells()
+        newBoard.addFigures()
+        setBoard(newBoard);
+    }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <>
+          <h3>Текущий игрок {currentPlayer?.color}</h3>
+          <div className="App">
+              <BoardComponents
+                  board={board}
+                  setBoard={setBoard}
+                  currentPlayer={currentPlayer}
+                  swapPlayer={swapPlayer}
+              />
+              <div className="tableFigure">
+                  <LostFigurs title={"черные фигуры"} figures={board.lostBlackFigurs}/>
+                  <LostFigurs title={"белые фигуры"} figures={board.lostWhiteFigurs}/>
+              </div>
+          </div>
+
+      </>
+
   );
 }
 
